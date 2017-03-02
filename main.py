@@ -20,16 +20,18 @@ clock = pygame.time.Clock()
 
 # Zach Image
 zach_img = pygame.image.load('zach.png')
-zach_ratio = 445/370
+zach_ratio = float(zach_img.get_rect().size[1]/zach_img.get_rect().size[0])
 zach_height = display_height/6
-zach_width = zach_ratio*zach_height
+zach_width = int(ceil(zach_ratio*zach_height))
 zach_img = pygame.transform.scale(zach_img, (zach_width,zach_height))
+
 
 # Background
 bg_img = pygame.image.load('bgtest.png')
-bg_height, bg_ratio = display_height, 4000.0/1080.0
-bg_width = bg_height*bg_ratio
-bg_img = pygame.transform.scale(bg_img, (int(ceil(bg_width)), bg_height)).convert()
+bg_ratio = float(bg_img.get_rect().size[0]/bg_img.get_rect().size[1])
+bg_height = display_height
+bg_width = int(ceil(bg_height*bg_ratio))
+bg_img = pygame.transform.scale(bg_img, (bg_width, bg_height)).convert()
 
 
 def bg(pos):
@@ -50,8 +52,8 @@ def on_platform(x,y):
         return False
 
 # Game Vars
-playerX = display_width/8
-playerY = display_height
+playerX, playerY =  display_width/8, display_height
+position = playerX
 dx, dy, bg_x = 0, 0, 0
 jumping = False
 jump_speed = -display_height/43.2
@@ -94,13 +96,14 @@ while isRunning:
         jumping = False
         dy += fall_acceleration
 
-    # Update position
+    # Update y position
     playerY += dy
     if playerY > display_height:
         playerY = display_height
     if playerY < zach_height:
         playerY, dy = zach_height, 0
-    print far_left, far_right, playerX, bg_x
+
+    # Update x position
     if playerX == display_width/2:
         bg_x -= dx
     if not(far_left or far_right):
@@ -108,11 +111,16 @@ while isRunning:
     else:
         playerX += dx
 
+    # Boundary collisions
     if playerX<zach_width/2:
         playerX = zach_width/2
-    if playerX>display_width-zach_width/2:
+    elif playerX>display_width-zach_width/2:
         playerX = display_width-zach_width/2
+    else:
+        # Update Absolute Position
+        position += dx
 
+    # Update background
     if bg_x >= 0:
         far_left, far_right = True, False
         bg_x = 0
