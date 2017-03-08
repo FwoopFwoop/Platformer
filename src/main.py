@@ -1,6 +1,6 @@
 import pygame
 import ctypes
-import player, background, platform
+import player, background, platform, menubutton
 import source, color
 from math import sqrt
 
@@ -19,6 +19,53 @@ display = pygame.display.set_mode(resolution,pygame.FULLSCREEN)
 pygame.display.set_caption('PyPlatformer')
 # Create Clock
 clock = pygame.time.Clock()
+fps = 60
+
+# Enable loops
+menu_running = True
+game_running = True
+
+# Main Menu Display
+
+# Menu Buttons
+buttons = pygame.sprite.Group()
+
+start_button = menubutton.MenuButton(resolution, display_height/2, text='Start')
+quit_button = menubutton.MenuButton(resolution,display_height/2+(start_button.height*1.5), text='Quit')
+
+buttons.add(start_button, quit_button)
+
+while menu_running:
+    # Get mouse position
+    pos = pygame.mouse.get_pos()
+
+    # Check Events
+    for event in pygame.event.get():
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                menu_running = game_running = False
+        if event.type == pygame.MOUSEBUTTONUP:
+            if start_button.rect.collidepoint(pos):
+                menu_running = False
+            if quit_button.rect.collidepoint(pos):
+                menu_running = game_running = False
+        if event.type == pygame.QUIT:
+            menu_running = game_running = False
+
+    # Set cursor
+    hovered_buttons = [b for b in buttons if b.rect.collidepoint(pos)]
+    if len(hovered_buttons) > 0:
+        pygame.mouse.set_cursor(*pygame.cursors.diamond)
+    else:
+        pygame.mouse.set_cursor(*pygame.cursors.arrow)
+
+    display.fill(color.white)
+    buttons.draw(display)
+    buttons.update()
+
+    pygame.display.update()
+    clock.tick(fps)
+
 
 # Sprite Groups
 players = pygame.sprite.Group()
@@ -58,26 +105,25 @@ side_collision_buffer = move_speed
 
 active_key = None
 
+
 def change_x(key):
     keys = {None:0, pygame.K_LEFT:-move_speed, pygame.K_RIGHT:move_speed}
     return keys[key]
 
-isRunning = True
-fps = 60
-
 # Game loop
-while isRunning:
-
+while game_running:
+    # Hide cursor
+    pygame.mouse.set_visible(False)
     # Check Events
     for event in pygame.event.get():
         # User closes window
         if event.type == pygame.QUIT:
-            isRunning = False
+            game_running = False
         # Key Press Events
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 # Quit game
-                isRunning = False
+                game_running = False
             if event.key == pygame.K_SPACE:
                 # Jump
                 if jump_count<2:
@@ -116,7 +162,7 @@ while isRunning:
                 jump_count = 0
             # Bottom collision
             elif playerY > collision.rect.y - up_collision_buffer:
-                playerY+=up_collision_buffer/2
+                playerY += up_collision_buffer/4
                 dy = 0
             # Left or Right collision
             elif playerX + player.width + side_collision_buffer > collision.rect.x or \
