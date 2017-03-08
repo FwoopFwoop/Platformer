@@ -53,8 +53,14 @@ move_speed = display_width/256.0
 far_left , far_right = True, False
 
 down_collision_buffer = display_height / sqrt(720)
-up_collision_buffer = jump_speed * 1.5
+up_collision_buffer = -jump_speed * 1.5
 side_collision_buffer = move_speed
+
+active_key = None
+
+def change_x(key):
+    keys = {None:0, pygame.K_LEFT:-move_speed, pygame.K_RIGHT:move_speed}
+    return keys[key]
 
 isRunning = True
 fps = 60
@@ -79,16 +85,19 @@ while isRunning:
                     jump_count += 1
             if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                 # Move left
-                dx = -move_speed
+                active_key = pygame.K_LEFT
             if event.key == pygame.K_RIGHT or event.key == pygame.K_d:
                 # Move right
-                dx = move_speed
+                active_key = pygame.K_RIGHT
         if event.type == pygame.KEYUP:
             # Key-up behaviour to prevent sticky key effect by only canceling
             # movement if player is moving in the direction of the key being released
             if ((event.key == pygame.K_RIGHT or event.key == pygame.K_d) and dx == move_speed) or \
                     ((event.key == pygame.K_LEFT or event.key == pygame.K_a) and dx == -move_speed):
-                dx = 0
+                active_key = None
+
+    # Set change in x
+    dx = change_x(active_key)
 
     # Move platforms into place
     for platform in platforms:
@@ -106,19 +115,17 @@ while isRunning:
                 dy = 0
                 jump_count = 0
             # Bottom collision
-            elif playerY > collision.rect.y+up_collision_buffer:
-                playerY = collision.rect.y+collision.rect.height+1
+            elif playerY > collision.rect.y - up_collision_buffer:
+                playerY+=up_collision_buffer/2
                 dy = 0
             # Left or Right collision
             elif playerX + player.width + side_collision_buffer > collision.rect.x or \
-                            playerX < collision.rect.x + collision.rect.width + side_collision_buffer:
+                    playerX < collision.rect.x + collision.rect.width + side_collision_buffer:
                 dx = 0
                 dy += fall_acceleration
     else:
         jumping = False
         dy += fall_acceleration
-
-    print dy
 
     # Update y position
     playerY += dy
