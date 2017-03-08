@@ -3,12 +3,10 @@ from math import ceil
 
 
 class Background(pygame.sprite.Sprite):
-    height, width = 0, 0
-
     def __init__(self,image, display_height):
         pygame.sprite.Sprite.__init__(self)
         # Create Image and Rect
-        self.image = pygame.image.load(image)
+        self.image = image
         self.rect = self.image.get_rect()
 
         # Calculate scaled dimensions

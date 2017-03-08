@@ -18,33 +18,6 @@ pygame.display.set_caption('PyPlatformer')
 # Create Clock
 clock = pygame.time.Clock()
 
-'''
-# Zach Image
-zach_img = pygame.image.load(img_dir+'zach_proto.png')
-zach_ratio = float(zach_img.get_rect().size[1]/zach_img.get_rect().size[0])
-zach_height = display_height/6
-zach_width = int(ceil(zach_ratio*zach_height))
-zach_img = pygame.transform.scale(zach_img, (zach_width,zach_height))
-
-
-# Background
-
-bg_img = pygame.image.load(img_dir+'bgtest.png')
-bg_ratio = float(bg_img.get_rect().size[0]/bg_img.get_rect().size[1])
-bg_height = display_height
-bg_width = int(ceil(bg_height*bg_ratio))
-bg_img = pygame.transform.scale(bg_img, (bg_width, bg_height)).convert()
-
-
-def bg(pos):
-    display.blit(bg_img, (pos, 0))
-
-
-def zach(x,y):
-    # Draw at coordinates, accounting for image width and height
-    display.blit(zach_img,(x-zach_width/2,y-zach_height))
-'''
-
 
 # Determines whether or not Zach is on a surface.
 def on_platform(x,y):
@@ -59,6 +32,7 @@ players = pygame.sprite.Group()
 backgrounds = pygame.sprite.Group()
 all_sprites = pygame.sprite.Group()
 
+
 player = player.Player(source.player('zach_proto.png'), display_height)
 background = background.Background(source.background('bgtest.png'), display_height)
 
@@ -67,7 +41,7 @@ backgrounds.add(background)
 all_sprites.add(player,background)
 
 # Game Vars
-playerX, playerY = display_width/8, display_height
+playerX, playerY = display_width/8, display_height-player.height
 position = playerX
 dx, dy, bg_x = 0, 0, 0
 jumping = False
@@ -80,7 +54,7 @@ move_speed = display_width/256.0
 far_left , far_right = True, False
 
 isRunning = True
-
+fps = 60
 
 # Game loop
 while isRunning:
@@ -108,7 +82,7 @@ while isRunning:
                 dx = 0
 
     # Player Y
-    if on_platform(playerX,playerY) and not jumping:
+    if on_platform(playerX,playerY+player.height) and not jumping:
         dy = 0
         jump_count = 0
     else:
@@ -117,24 +91,24 @@ while isRunning:
 
     # Update y position
     playerY += dy
-    if playerY > display_height:
-        playerY = display_height
+    if playerY > display_height-player.height:
+        playerY = display_height-player.height
     if playerY < player.height:
         playerY, dy = player.height, 0
 
     # Update x position
-    if playerX == display_width/2:
+    if playerX == (display_width-player.width)/2:
         bg_x -= dx
     if not(far_left or far_right):
-        playerX = display_width/2
+        playerX = (display_width-player.width)/2
     else:
         playerX += dx
 
     # Boundary collisions
-    if playerX<player.width/2:
-        playerX = player.width/2
-    elif playerX>display_width-player.width/2:
-        playerX = display_width-player.width/2
+    if playerX<0:
+        playerX = 0
+    elif playerX>display_width-player.width:
+        playerX = display_width-player.width
     else:
         # Update Absolute Position
         position += dx
@@ -160,6 +134,6 @@ while isRunning:
     all_sprites.update()
 
     pygame.display.update()
-    clock.tick(60)
+    clock.tick(fps)
 
 pygame.quit()
