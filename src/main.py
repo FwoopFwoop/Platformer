@@ -1,11 +1,9 @@
-import pygame
 import ctypes
-import player, background, platform, menubutton
-import source, color
 from math import sqrt
-
-# Resource Directories
-img_dir = 'resources/png/'
+import pygame
+import color
+import source
+from src.sprites import background, player, menubutton, platform, splash
 
 # Initialize pygame components
 pygame.init()
@@ -25,15 +23,22 @@ fps = 60
 menu_running = True
 game_running = True
 
-# Main Menu Display
+# Main Menu Splash and Background
+title_splash = splash.Splash(source.splash('splash.png'), resolution)
+menu_background = background.Background(source.background('menu_bg.png'),display_height)
+splashes = pygame.sprite.Group()
+backgrounds = pygame.sprite.Group()
+splashes.add(title_splash), backgrounds.add(menu_background)
 
 # Menu Buttons
 buttons = pygame.sprite.Group()
-
-start_button = menubutton.MenuButton(resolution, display_height/2, text='Start')
-quit_button = menubutton.MenuButton(resolution,display_height/2+(start_button.height*1.5), text='Quit')
+start_button = menubutton.MenuButton(resolution, display_height / 2, text='Start')
+quit_button = menubutton.MenuButton(resolution, display_height / 2 + (start_button.height * 1.5), text='Quit')
 
 buttons.add(start_button, quit_button)
+
+all_menu_sprites = pygame.sprite.Group()
+all_menu_sprites.add(buttons, title_splash, menu_background)
 
 while menu_running:
     # Get mouse position
@@ -45,6 +50,7 @@ while menu_running:
             if event.key == pygame.K_ESCAPE:
                 menu_running = game_running = False
         if event.type == pygame.MOUSEBUTTONUP:
+            print event
             if start_button.rect.collidepoint(pos):
                 menu_running = False
             if quit_button.rect.collidepoint(pos):
@@ -60,8 +66,12 @@ while menu_running:
         pygame.mouse.set_cursor(*pygame.cursors.arrow)
 
     display.fill(color.white)
+
+    backgrounds.draw(display)
+    splashes.draw(display)
     buttons.draw(display)
-    buttons.update()
+
+    all_menu_sprites.update()
 
     pygame.display.update()
     clock.tick(fps)
@@ -78,8 +88,8 @@ player = player.Player(source.player('zach_proto.png'), display_height)
 background = background.Background(source.background('bgtest.png'), display_height)
 
 # Platforms
-floor = platform.Platform(color.dark_green, (background.width, background.height/25), (0, background.height-background.height/25))
-plat_1 = platform.Platform(color.grey, (display_width/7, display_height/25), (background.width/2, display_height/2))
+floor = platform.Platform(color.dark_green, (background.width, background.height / 25), (0, background.height - background.height / 25))
+plat_1 = platform.Platform(color.grey, (display_width / 7, display_height / 25), (background.width / 2, display_height / 2))
 
 # Add sprites to groups
 players.add(player)

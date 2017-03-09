@@ -1,9 +1,9 @@
 import pygame
-import color
+from src import color
 
 
 class MenuButton(pygame.sprite.Sprite):
-    def __init__(self, (display_width, display_height), y, color=color.black, text='', text_color=color.white):
+    def __init__(self, (display_width, display_height), y, color= color.black, text='', text_color= color.white):
         pygame.sprite.Sprite.__init__(self)
 
         self.height = display_height/8

@@ -10,3 +10,7 @@ def background(image):
 
 def player(image):
     return pygame.image.load(img_dir+image).convert_alpha()
+
+
+def splash(image):
+    return pygame.image.load(img_dir+image).convert_alpha()
