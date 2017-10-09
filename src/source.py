@@ -1,7 +1,7 @@
 import pygame
 
 # Resource Directories
-img_dir = 'resources/png/'
+img_dir = '../resources/png/'
 
 
 def background(image):

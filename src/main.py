@@ -3,15 +3,18 @@ from math import sqrt
 import pygame
 import color
 import source
-from src.sprites import background, player, menubutton, platform, splash
+import platform
+from sprites import background, player, menubutton, platform, splash
 
 # Initialize pygame components
 pygame.init()
 
 # Obtain Screen Size
-user32 = ctypes.windll.user32
-resolution = (display_width , display_height) = (user32.GetSystemMetrics(0),user32.GetSystemMetrics(1))
+resolution =  (display_width , display_height) = (640,480)
 # Create display surface
+display = pygame.display.set_mode(resolution,pygame.FULLSCREEN)
+widthGame, heightGame = display.get_size()
+resolution =  (display_width , display_height) = (widthGame, heightGame)
 display = pygame.display.set_mode(resolution,pygame.FULLSCREEN)
 # Set window title
 pygame.display.set_caption('PyPlatformer')
